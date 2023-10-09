@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 SOURCE=$(pwd)
+REQUIRED=(git ncurses-utils)
 echo -e "This script is non-destructive, feel free to run it accidentally every evening.\n"
 
 #
