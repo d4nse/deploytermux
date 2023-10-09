@@ -1,8 +1,31 @@
 #!/usr/bin/bash
 
 SOURCE=$(pwd)
+echo -e "This script is non-destructive, feel free to run it accidentally every evening.\n"
 
-#	FUNCTIONS	#
+#
+#   CHECKS 
+#
+
+if ! command -v "git" &> /dev/null;
+then
+    echo "Git is required for this script to run successfully."
+    read -p "Do you want to proceed with git installation? (y/n) " yn
+    case $yn in
+        y) 
+            pkg install git;;
+        n)
+            echo "Terminating script..."
+            exit 0;;
+        *) 
+            echo "Invalid response, terminating anyways..."
+            exit 1;;
+    esac
+fi
+
+#
+#	FUNCTIONS	
+#
 
 function configureTermux {
 
@@ -67,7 +90,6 @@ function configureTermux {
         [[ "$SWITCH" == "true" ]] && termux-reload-settings
 }
 
-
 function configureShell {
 
     # Variables
@@ -98,19 +120,6 @@ function configureShell {
 
 }
 
-function cout {
-	echo -e "#\n#	$1\n#"
+function configureSSH {
+
 }
-
-
-#	EXECUTION	#
-
-#cout "SETTING UP TERMUX"
-#configureTermux
-#
-#cout "GETTING PACKAGES"
-#pkg install -y git zsh neovim termux-api tree file
-#
-#cout "CONFIGURING PACKAGES"
-#configureZSH
-
