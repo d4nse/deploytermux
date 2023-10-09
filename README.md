@@ -1,13 +1,14 @@
 # termux-config
 My personal termux configuration
 
+DO NOT TRY TO INSTALL IT, NOT IMPLEMENTED YET xd
 # Requirements
 - Clean installation of Termux from f-droid
 - Termux:API
 - Git
 
 # Installation
-`shell
+`
 chmod +x configure.sh && ./configure.sh
 `
 
@@ -18,4 +19,5 @@ chmod +x configure.sh && ./configure.sh
 - [ ] Code packages installation 
 - [ ] Code openssh config 
 - [ ] Code basic neovim config 
+- [ ] Code complete installation
 - [ ] Come up with something more than that
