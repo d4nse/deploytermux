@@ -1,24 +1,21 @@
 # termux-config
 My personal termux configuration
 
-DO NOT TRY TO INSTALL IT, NOT IMPLEMENTED YET xd
-# Requirements
-- Clean installation of Termux from f-droid
-- Termux:API
-- Git
+## Gettings started
 
-# Installation
-`
-chmod +x configure.sh && ./configure.sh
-`
+1. Install [Termux](https://f-droid.org/en/packages/com.termux/).
+2. Install [Termux:API](https://f-droid.org/en/packages/com.termux.api/).
+3. Install git with `pkg install git`.
+4. The most important part. Wait until i finish the script. :)
+
 
 # TODO
 - [ ] Write better readme
-- [x] Code termux config 
-- [x] Code zsh config 
+- [ ] Code termux config 
+- [ ] Code zsh config 
 - [ ] Code some useful scripts
 - [ ] Code packages installation 
-- [x] Code openssh config 
+- [ ] Code openssh config 
 - [ ] Code basic neovim config 
 - [ ] Code complete installation
 - [ ] Come up with something more than that
