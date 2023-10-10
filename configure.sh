@@ -30,7 +30,7 @@ function configureTermux {
         local DEST PROP COLOR FONT MOTD SOURCE SWITCH
         DEST="$HOME/.termux"
         PROP="$DEST/termux.properties"
-        COLOR="$DEST/color.properties"
+        COLOR="$DEST/colors.properties"
         FONT="$DEST/font.ttf"
         MOTD="$DEST/motd.sh"
         SOURCE="$GLOBALSOURCE/termux"
@@ -61,7 +61,7 @@ function configureTermux {
         if [[ ! -f "$COLOR" ]];
         then
               	echo "Setting up colorscheme..."
-                cp "$SOURCE/color.properties" "$DEST" && local SWITCH="true"
+                cp "$SOURCE/colors.properties" "$DEST" && local SWITCH="true"
         else
             	echo "Colorscheme file already exists."
         fi
@@ -99,13 +99,14 @@ function configureShell {
     SOURCE="$GLOBALSOURCE/config"
 
     # If ZSH isnt main shell, set it up.
-	if [[ "$SHELL" == "bash" ]];
+	if [[ "$SHELL" != "zsh" ]];
 	then
 		echo "Setting up ZSH..."
 		chsh -s zsh
 
-        # Configure ZSHRC
-		[[ ! -f "$ZSHRC" ]] && cp "$SOURCE/zshrc" "$ZSHRC"
+        # Configure ZSHRC 
+        # shellcheck disable=SC1090 # 
+		[[ ! -f "$ZSHRC" ]] && cp "$SOURCE/zshrc" "$ZSHRC" && source "$ZSHRC"
 
         # Pre-Configure P10K
         [[ ! -d "$HOME/.config" ]] && mkdir "$HOME/.config"
