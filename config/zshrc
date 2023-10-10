@@ -8,6 +8,9 @@ source ~/.config/powerlevel10k/powerlevel10k.zsh-theme
 # Enable vim-like behaviour
 bindkey -v
 
+# PATH extensions
+export PATH="$PATH:$PREFIX/etc/profile.d" # This allows termux-services to work with ZSH
+
 # Setup better traversal
 setopt autocd autopushd pushdignoredups
 alias d="dirs -v | head -10"
