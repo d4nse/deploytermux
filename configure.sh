@@ -7,17 +7,29 @@ REQUIRED=(git ncurses-utils zsh termux-services openssh)
 #   CHECKS 
 #
 
+echo -e "THIS SCRIPT IS DESTRUCTIVE TO PERSONAL FILES.\nONLY RUN IT ON A CLEAN TERMUX SYSTEM\n."
+read -r -p "You sure you want to proceed?" yn
+case $yn in
+    y)  ;;
+    *)
+        echo "Terminating script..."
+        exit 0;;
+esac
+
 echo -e "Several packages are required for this config to function.\nRequired:\n\t${REQUIRED[*]}"
 read -r -p "Do you want to proceed with their installation now? (y/n) " yn
 case $yn in
     y)  
-        pkg install "${REQUIRED[@]}";;
-    n)
+        echo "Updating, might take awhile..."
+        apt-get update -y &>/dev/null
+        apt-get upgrade -o Dpkg::Options::="--force-confnew" -y &>/dev/null
+
+        echo "Installing dependencies..."
+        pkg install -y "${REQUIRED[*]}"
+        ;;
+    *)
         echo "Terminating script..."
         exit 0;;
-    *) 
-        echo "Invalid response, terminating anyways..."
-        exit 1;;
 esac
 
 #
@@ -27,17 +39,20 @@ esac
 function configureTermux {
 
         # Variables
-        local DEST PROP COLOR FONT MOTD SOURCE SWITCH
-        DEST="$HOME/.termux"
-        PROP="$DEST/termux.properties"
-        COLOR="$DEST/colors.properties"
-        FONT="$DEST/font.ttf"
-        MOTD="$DEST/motd.sh"
+        local SOURCE DESTINATION
+        DESTINATION="$HOME/.termux"
         SOURCE="$GLOBALSOURCE/termux"
-        SWITCH="false"
         
-        # If config directory doesnt exist, then create it
-        [[ ! -d "$DEST" ]] && mkdir "$DEST"
+        # Check if .termux exists
+        if [[ -d "$DESTINATION" ]];
+        then 
+            # Destroy it and make anew
+            rm -rf "$DESTINATION"
+            mkdir "$DESTINATION"
+
+            # Populate it with files from source and reload settings
+            cp -- "$SOURCE/*" "$DESTINATION" && termux-reload-settings
+        fi
 
         # If storage isnt set up, then set it up
         if [[ ! -d "$HOME/storage" ]];
@@ -47,45 +62,6 @@ function configureTermux {
         else
                 echo "Storage already set up"
         fi
-        
-        # If termux.properties doesnt exist, then copy it from repo
-        if [[ ! -f "$PROP" ]];
-        then
-                echo "Setting up properties..."
-                cp "$SOURCE/termux.properties" "$DEST" && local SWITCH="true"
-        else
-                echo "Properties file already exist."
-        fi
-        
-        # If color.properties doesnt exist, then copy it from repo
-        if [[ ! -f "$COLOR" ]];
-        then
-              	echo "Setting up colorscheme..."
-                cp "$SOURCE/colors.properties" "$DEST" && local SWITCH="true"
-        else
-            	echo "Colorscheme file already exists."
-        fi
-        
-        # If font.ttf doesnt exist, then copy it from repo
-        if [[ ! -f "$FONT" ]];
-        then
-        	    echo "Setting up font..."
-                cp "$SOURCE/font.ttf" "$DEST" && local SWITCH="true"
-        else
-        	    echo "Font file already exists."
-        fi
-        
-        # If motd script doesnt exist, then copy it from repo
-        if [[ ! -f "$MOTD" ]];
-        then
-        	    echo "Setting up MOTD..."
-                cp "$SOURCE/motd.sh" "$DEST"
-        else
-        	    echo "MOTD file already exists"
-        fi
-        
-        # Reload settings if necessary
-        [[ "$SWITCH" == "true" ]] && termux-reload-settings
 }
 
 function configureShell {
@@ -95,7 +71,7 @@ function configureShell {
 	SHELL=$(basename "$SHELL")
 	ZSHRC="$HOME/.zshrc"
     P10KRC="$HOME/.config/p10k.zsh"
-    P10KDIR="$HOME/.local/share/powerline10k"
+    P10KDIR="$HOME/.local/share/powerlevel10k"
     SOURCE="$GLOBALSOURCE/config"
 
     # If ZSH isnt main shell, set it up.
@@ -106,7 +82,7 @@ function configureShell {
 
         # Configure ZSHRC 
         # shellcheck disable=SC1090 # 
-		[[ ! -f "$ZSHRC" ]] && cp "$SOURCE/zshrc" "$ZSHRC" && source "$ZSHRC"
+		[[ ! -f "$ZSHRC" ]] && cp "$SOURCE/zshrc" "$ZSHRC" && zsh && source "$ZSHRC"
 
         # Pre-Configure P10K
         [[ ! -d "$HOME/.config" ]] && mkdir "$HOME/.config"
@@ -139,6 +115,6 @@ function closingMessage {
 }
 
 configureTermux
-configureShell
-configureSSH
-closingMessage
+#configureShell
+#configureSSH
+#closingMessage
