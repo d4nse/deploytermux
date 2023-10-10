@@ -1,28 +1,24 @@
 #!/usr/bin/bash
 
-SOURCE=$(pwd)
-REQUIRED=(git ncurses-utils)
-echo -e "This script is non-destructive, feel free to run it accidentally every evening.\n"
+GLOBALSOURCE=$(pwd)
+REQUIRED=(git ncurses-utils zsh termux-services openssh)
 
 #
 #   CHECKS 
 #
 
-if ! command -v "git" &> /dev/null;
-then
-    echo "Git is required for this script to run successfully."
-    read -p "Do you want to proceed with git installation? (y/n) " yn
-    case $yn in
-        y) 
-            pkg install git;;
-        n)
-            echo "Terminating script..."
-            exit 0;;
-        *) 
-            echo "Invalid response, terminating anyways..."
-            exit 1;;
-    esac
-fi
+echo -e "Several packages are required for this config to function.\nRequired:\n\t${REQUIRED[*]}"
+read -r -p "Do you want to proceed with their installation now? (y/n) " yn
+case $yn in
+    y)  
+        pkg install "${REQUIRED[@]}";;
+    n)
+        echo "Terminating script..."
+        exit 0;;
+    *) 
+        echo "Invalid response, terminating anyways..."
+        exit 1;;
+esac
 
 #
 #	FUNCTIONS	
@@ -31,16 +27,17 @@ fi
 function configureTermux {
 
         # Variables
-        local DIR="$HOME/.termux"
-        local PROPFILE="$DIR/termux.properties"
-        local COLORFILE="$DIR/color.properties"
-        local FONTFILE="$DIR/font.ttf"
-        local MOTDFILE="$DIR/motd.sh"
-        local SOURCE="$SOURCE/termux"
-        local SWITCH="false"
+        local DEST PROP COLOR FONT MOTD SOURCE SWITCH
+        DEST="$HOME/.termux"
+        PROP="$DEST/termux.properties"
+        COLOR="$DEST/color.properties"
+        FONT="$DEST/font.ttf"
+        MOTD="$DEST/motd.sh"
+        SOURCE="$GLOBALSOURCE/termux"
+        SWITCH="false"
         
         # If config directory doesnt exist, then create it
-        [[ ! -d "$DIR" ]] && mkdir "$DIR"
+        [[ ! -d "$DEST" ]] && mkdir "$DEST"
 
         # If storage isnt set up, then set it up
         if [[ ! -d "$HOME/storage" ]];
@@ -52,37 +49,37 @@ function configureTermux {
         fi
         
         # If termux.properties doesnt exist, then copy it from repo
-        if [[ ! -f "$PROPFILE" ]];
+        if [[ ! -f "$PROP" ]];
         then
                 echo "Setting up properties..."
-                cp "$SOURCE/termux.properties" "$DIR" && local SWITCH="true"
+                cp "$SOURCE/termux.properties" "$DEST" && local SWITCH="true"
         else
                 echo "Properties file already exist."
         fi
         
         # If color.properties doesnt exist, then copy it from repo
-        if [[ ! -f "$COLORFILE" ]];
+        if [[ ! -f "$COLOR" ]];
         then
               	echo "Setting up colorscheme..."
-                cp "$SOURCE/color.properties" "$DIR" && local SWITCH="true"
+                cp "$SOURCE/color.properties" "$DEST" && local SWITCH="true"
         else
             	echo "Colorscheme file already exists."
         fi
         
         # If font.ttf doesnt exist, then copy it from repo
-        if [[ ! -f "$FONTFILE" ]];
+        if [[ ! -f "$FONT" ]];
         then
         	    echo "Setting up font..."
-                cp "$SOURCE/font.ttf" "$DIR" && local SWITCH="true"
+                cp "$SOURCE/font.ttf" "$DEST" && local SWITCH="true"
         else
         	    echo "Font file already exists."
         fi
         
-        # MOTD
-        if [[ ! -f "$MOTDFILE" ]];
+        # If motd script doesnt exist, then copy it from repo
+        if [[ ! -f "$MOTD" ]];
         then
         	    echo "Setting up MOTD..."
-                cp "$SOURCE/motd.sh" "$DIR"
+                cp "$SOURCE/motd.sh" "$DEST"
         else
         	    echo "MOTD file already exists"
         fi
@@ -94,11 +91,12 @@ function configureTermux {
 function configureShell {
 
     # Variables
-	local SHELL=$(basename $SHELL)
-	local ZSHRC="$HOME/.zshrc"
-    local P10KRC="$HOME/.config/p10k.zsh"
-    local P10KDIR="$HOME/.local/share/powerline10k"
-    local SOURCE="$SOURCE/config"
+    local SHELL ZSHRC P10KRC P10KDIR SOURCE
+	SHELL=$(basename "$SHELL")
+	ZSHRC="$HOME/.zshrc"
+    P10KRC="$HOME/.config/p10k.zsh"
+    P10KDIR="$HOME/.local/share/powerline10k"
+    SOURCE="$GLOBALSOURCE/config"
 
     # If ZSH isnt main shell, set it up.
 	if [[ "$SHELL" == "bash" ]];
@@ -118,9 +116,22 @@ function configureShell {
     else
         echo "Seems like ZSH is already set up."
 	fi
-
 }
 
 function configureSSH {
 
+    # Variables
+    local DSTATUS
+    DSTATUS=$(sv status sshd | grep -o "down")
+
+    # If ssh daemon is down, enable it's service
+    echo "Settings up SSH..."
+    [[ "$DSTATUS" == "down" ]] && sv-enable sshd
+
+}
+
+function closingMessage {
+    
+    echo -e "#\n#   LAST STEPS\n#\n"
+    echo "Set: run passwd to allow ssh connections"
 }

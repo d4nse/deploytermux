@@ -18,7 +18,7 @@ chmod +x configure.sh && ./configure.sh
 - [x] Code zsh config 
 - [ ] Code some useful scripts
 - [ ] Code packages installation 
-- [ ] Code openssh config 
+- [x] Code openssh config 
 - [ ] Code basic neovim config 
 - [ ] Code complete installation
 - [ ] Come up with something more than that
