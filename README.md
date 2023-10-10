@@ -16,6 +16,7 @@ chmod +x configure.sh && ./configure.sh
 - [ ] Write better readme
 - [x] Code termux config 
 - [x] Code zsh config 
+- [ ] Code some useful scripts
 - [ ] Code packages installation 
 - [ ] Code openssh config 
 - [ ] Code basic neovim config 
