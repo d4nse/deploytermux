@@ -108,6 +108,7 @@ function configureShell {
 		[[ ! -f "$ZSHRC" ]] && cp "$SOURCE/zshrc" "$ZSHRC"
 
         # Pre-Configure P10K
+        [[ ! -d "$HOME/.config" ]] && mkdir "$HOME/.config"
         [[ ! -f "$P10KRC" ]] && cp "$SOURCE/p10k.zsh" "$P10KRC"
 
         # Install P10K
@@ -125,13 +126,18 @@ function configureSSH {
     DSTATUS=$(sv status sshd | grep -o "down")
 
     # If ssh daemon is down, enable it's service
-    echo "Settings up SSH..."
+    echo "Setting up SSH..."
     [[ "$DSTATUS" == "down" ]] && sv-enable sshd
 
 }
 
 function closingMessage {
-    
+
     echo -e "#\n#   LAST STEPS\n#\n"
     echo "Set: run passwd to allow ssh connections"
 }
+
+configureTermux
+configureShell
+configureSSH
+closingMessage
