@@ -8,7 +8,7 @@ REQUIRED=(git ncurses-utils zsh termux-services openssh)
 #
 
 echo -e "THIS SCRIPT IS DESTRUCTIVE TO PERSONAL FILES.\nONLY RUN IT ON A CLEAN TERMUX SYSTEM\n."
-read -r -p "You sure you want to proceed?" yn
+read -r -p "You sure you want to proceed? (y/n) " yn
 case $yn in
     y)  ;;
     *)
@@ -25,8 +25,8 @@ case $yn in
         apt-get upgrade -o Dpkg::Options::="--force-confnew" -y &>/dev/null
 
         echo "Installing dependencies..."
-        pkg install -y "${REQUIRED[*]}"
-        ;;
+        # shellcheck disable=SC2048 disable=SC2086 # Unquoted is required since pkg cant find a string of packages
+        pkg install -y ${REQUIRED[*]};;
     *)
         echo "Terminating script..."
         exit 0;;
@@ -51,7 +51,7 @@ function configureTermux {
             mkdir "$DESTINATION"
 
             # Populate it with files from source and reload settings
-            cp -- "$SOURCE/*" "$DESTINATION" && termux-reload-settings
+            cp -- "$SOURCE/"* "$DESTINATION" && termux-reload-settings
         fi
 
         # If storage isnt set up, then set it up
