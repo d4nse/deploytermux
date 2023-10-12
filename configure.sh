@@ -1,114 +1,104 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 
-GLOBALSOURCE=$(pwd)
-REQUIRED=(git ncurses-utils zsh termux-services openssh)
+source="$(pwd)/rice"
 
-#
-#   CHECKS
-#
+check_dir_exists() {
+    file=$1
+    if [ -d "$file" ]; then
+        exists=true
+    else
+        printf "%s doesn't exist\n" "$file"
+        exists=false
+        $2
+    fi
+}
 
-echo -e "THIS SCRIPT IS DESTRUCTIVE TO PERSONAL FILES.\nONLY RUN IT ON A CLEAN TERMUX SYSTEM\n."
+check_file_exists() {
+    file=$1
+    if [ -f "$file" ]; then
+        exists=true
+    else
+        printf "%s doesn't exist\n" "$file"
+        exists=false
+        $2
+    fi
+}
+
+printf "This script is designed for Termux installation only\n"
 read -r -p "You sure you want to proceed? (y/n) " yn
 case $yn in
 y) ;;
 *)
-    echo "Terminating script..."
+    printf "Terminating script...\n"
     exit 0
     ;;
 esac
 
-echo -e "Several packages are required for this config to function.\nRequired:\n\t${REQUIRED[*]}"
-read -r -p "Do you want to proceed with their installation now? (y/n) " yn
-case $yn in
-y)
-    echo "Updating, might take awhile..."
-    apt-get update -y &>/dev/null
-    apt-get upgrade -o Dpkg::Options::="--force-confnew" -y &>/dev/null
+printf "Installing dependencies listed in dependencies.txt...\n"
+# shellcheck disable=SC2207
+DEPLIST=($(sed -e 's/#.*$//' -e '/^$/d' dependencies.txt))
+apt-get update -y &>/dev/null
+apt-get upgrade -o Dpkg::Options::="--force-confnew" -y &>/dev/null
+# shellcheck disable=SC2048 disable=SC2086 # Unquoted is required since pkg cant find a string of packages
+pkg install -y ${DEPLIST[*]} &>/dev/null
+printf "Installed dependencies\n"
 
-    echo "Installing dependencies..."
-    # shellcheck disable=SC2048 disable=SC2086 # Unquoted is required since pkg cant find a string of packages
-    pkg install -y ${REQUIRED[*]} &>/dev/null
-    ;;
-*)
-    echo "Terminating script..."
-    exit 0
-    ;;
-esac
+check_dir_exists "$HOME/.termux"
+if $exists; then
+    printf "your .termux directory already exists\n"
+else
+    printf "creating .termux directory for the user\n"
+    mkdir -p "$HOME/.termux"
+fi
 
-#
-#	FUNCTIONS
-#
+printf "Adding dots to .termux\n"
+cp -f "$source/dots/termux.properties" "$HOME/.termux/"
+cp -f "$source/dots/colors.properties" "$HOME/.termux/"
+cp -f "$source/dots/font.ttf" "$HOME/.termux/"
+cp -f "$source/dots/motd.sh" "$HOME/.termux/"
+termux-reload-settings
 
-function configureTermux {
+check_dir_exists "$HOME/storage"
+if $exists; then
+    printf "your storage directory already exists\n"
+else
+    printf "setting storage up for the user\n"
+    termux-setup-storage
+fi
 
-    # Variables
-    local DESTINATION SOURCE
-    DESTINATION="$HOME/.termux"
-    SOURCE="$GLOBALSOURCE/termux"
+check_dir_exists "$HOME/.config"
+if $exists; then
+    printf "your .config directory already exists\n"
+else
+    printf "creating .config directory for the user\n"
+    mkdir -p "$HOME/.config"
+fi
 
-    # Check if .termux exists and delete it
-    echo "Setting up termux properties..."
-    [[ -d "$DESTINATION" ]] && rm -rf "$DESTINATION"
-    mkdir "$DESTINATION" &&
-        cp -- "$SOURCE/"* "$DESTINATION" &&
-        termux-reload-settings # Make sure when cp-ing that * is outside of quotes
+printf "Adding dots to user home\n"
+cp -f "$source/dots/.zshrc" "$HOME"
+cp -f "$source/dots/.p10k.zsh" "$HOME"
+touch "$HOME/.hushlogin"
 
-    # If storage isnt set up, then set it up
-    if [[ ! -d "$HOME/storage" ]]; then
-        echo "Setting up storage..."
-        termux-setup-storage
-    else
-        echo "Storage already set up"
-    fi
-}
+check_dir_exists "$HOME/.config/powerlevel10k"
+if $exists; then
+    printf "your powerlevel10k theme is already installed\n"
+else
+    printf "cloning powerlevel10k from github\n"
+    git clone --depth=1 "https://github.com/romkatv/powerlevel10k.git" "$HOME/.config/powerlevel10k"
+fi
 
-function configureShell {
-
-    # Variables
-    local SHELL ZSHRC P10KRC P10KDIR SOURCE
-    SHELL=$(basename "$SHELL")
-    ZSHRC="$HOME/.zshrc"
-    P10KRC="$HOME/.config/p10k.zsh"
-    P10KDIR="$HOME/.local/share/powerlevel10k"
-    SOURCE="$GLOBALSOURCE/config"
-
-    # If ZSH isnt main shell, set it up.
-    if [[ "$SHELL" != "zsh" ]]; then
-        echo "Setting up ZSH..."
-        chsh -s zsh
-
-        # Configure ZSHRC
-        # shellcheck disable=SC1090 #
-        [[ ! -f "$ZSHRC" ]] && cp "$SOURCE/zshrc" "$ZSHRC" && zsh && source "$ZSHRC"
-
-        # Pre-Configure P10K
-        [[ ! -d "$HOME/.config" ]] && mkdir "$HOME/.config"
-        [[ ! -f "$P10KRC" ]] && cp "$SOURCE/p10k.zsh" "$P10KRC"
-
-        # Install P10K
-        [[ ! -d "$P10KDIR" ]] && mkdir -p "$P10KDIR"
-        git clone --depth=1 "https://github.com/romkatv/powerlevel10k.git" "$P10KDIR"
-    else
-        echo "Seems like ZSH is already set up."
-    fi
-}
-
-function configureSSH {
-
-    # Variables
-    local DSTATUS
-    DSTATUS=$(sv status sshd | grep -o "down")
-
-    # If ssh daemon is down, enable it's service
-    echo "Setting up SSH..."
-    [[ "$DSTATUS" == "down" ]] && sv-enable sshd
-
-}
+# dropbear
+# chsh -s zsh
+# exec zsh
 
 function closingMessage {
 
     echo -e "#\n#   LAST STEPS\n#\n"
-    echo "Set: run passwd to allow ssh connections"
+    printf "First of all, add this to your .ssh/config on PC:\n\nHost phone\n\tHostName termux_LAN_address\n\tUser WHOAMI_to_check_username\n\tPort 8022\n"
+    printf "\nNext, run:\n\tpasswd\n\t# Set password in termux for initial ssh connection\n"
+    printf "\n\tssh-keygen -t rsa -b 4096 -f id_rsa\n\t# Generate ssh keys on PC\n"
+    printf "\n\trsync id_rsa.pub phone:.ssh\n\t# Send public key from PC to termux\n"
+    printf "\n\tssh phone cat .ssh/id_rsa.pub >> .ssh/authorized_keys\n\t# Add public key to authorized keys file\n"
 }
 
 #configureTermux
