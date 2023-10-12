@@ -75,6 +75,7 @@ fi
 
 printf "Adding dots to user home\n"
 cp -f "$source/dots/.zshrc" "$HOME"
+cp -f "$source/dots/.zprofile" "$HOME"
 cp -f "$source/dots/.p10k.zsh" "$HOME"
 touch "$HOME/.hushlogin"
 
