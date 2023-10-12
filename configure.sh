@@ -87,21 +87,12 @@ else
     git clone --depth=1 "https://github.com/romkatv/powerlevel10k.git" "$HOME/.config/powerlevel10k"
 fi
 
-# dropbear
-# chsh -s zsh
-# exec zsh
+printf "LAST STEPS\n"
+printf "First of all, add this to your .ssh/config on PC:\n\nHost phone\n\tHostName termux_LAN_address\n\tUser WHOAMI_to_check_username\n\tPort 8022\n"
+printf "\nNext, run:\n\tpasswd\n\t# Set password in termux for initial ssh connection\n"
+printf "\n\tssh-keygen -t rsa -b 4096 -f id_rsa\n\t# Generate ssh keys on PC\n"
+printf "\n\trsync id_rsa.pub phone:.ssh\n\t# Send public key from PC to termux\n"
+printf "\n\tssh phone cat .ssh/id_rsa.pub >> .ssh/authorized_keys\n\t# Add public key to authorized keys file\n"
 
-function closingMessage {
-
-    echo -e "#\n#   LAST STEPS\n#\n"
-    printf "First of all, add this to your .ssh/config on PC:\n\nHost phone\n\tHostName termux_LAN_address\n\tUser WHOAMI_to_check_username\n\tPort 8022\n"
-    printf "\nNext, run:\n\tpasswd\n\t# Set password in termux for initial ssh connection\n"
-    printf "\n\tssh-keygen -t rsa -b 4096 -f id_rsa\n\t# Generate ssh keys on PC\n"
-    printf "\n\trsync id_rsa.pub phone:.ssh\n\t# Send public key from PC to termux\n"
-    printf "\n\tssh phone cat .ssh/id_rsa.pub >> .ssh/authorized_keys\n\t# Add public key to authorized keys file\n"
-}
-
-#configureTermux
-#configureShell
-#configureSSH
-#closingMessage
+chsh -s zsh
+exec zsh
