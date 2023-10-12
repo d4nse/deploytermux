@@ -28,10 +28,12 @@ alias 9="cd -9"
 autoload -U compinit && compinit
 zstyle ":completion:*" matcher-list "m:{a-z}={A-Za-z}"
 
+# Enable remote
+dropbear
+
 # Aliases
 alias ls="ls --color=tty"
 alias grep="grep --color=auto"
-
 alias -s {zshrc,zsh,lua,txt,md}=nvim
 
 # MOTD

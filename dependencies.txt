@@ -1,10 +1,12 @@
 #termux specific
-termux-services
 termux-api
+
+#remote
+dropbear
+rsync
+git
 
 #misc
 neovim
-git
 ncurses-utils
 zsh
-openssh
