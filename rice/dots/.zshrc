@@ -2,8 +2,8 @@
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-source "$HOME/.local/share/powerlevel10k/powerlevel10k.zsh-theme"
-[[ ! -f ~/.config/p10k.zsh ]] || source ~/.config/p10k.zsh
+source "$HOME/.config/powerlevel10k/powerlevel10k.zsh-theme"
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Enable vim-like behaviour
 bindkey -v
@@ -34,13 +34,28 @@ alias grep="grep --color=auto"
 
 alias -s {zshrc,zsh,lua,txt,md}=nvim
 
-# Some testing stuff
+# MOTD
+MOTD=(
+"Your eyes deceive you."
+"And illusion fools you all."
+"Ends all."
+"You die as you lived."
+"Ahem. Gentlemen."
+"The system needs you."
+"You are the Operator."
+
+)
+MESSAGE="${MOTD[$(( $RANDOM % ${#MOTD[@]} ))]}"
 COLUMNS=$(tput cols)
-local DSTATUS=$(sv status sshd | grep -o "run" | head -n1)
+DSTATUS=$(sv status sshd | grep -o "run" | head -n1)
 PRIVATEIP=$(ifconfig 2>/dev/null | grep -oE '192\.168\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
+
+printf "%*s\n\n\n" $(((${#MESSAGE}+$COLUMNS)/2)) "$MESSAGE\n\n\n"
+printf "%*s\n" $(($COLUMNS-5)) "d4nse"
 if [[ "$DSTATUS" != "run" ]];
 then
     printf "%*s\n" $(($COLUMNS-5)) "SSHD is down"
 else
     printf "%*s\n" $(($COLUMNS-5)) "SSHD on $PRIVATEIP"
 fi
+
