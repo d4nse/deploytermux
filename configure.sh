@@ -55,7 +55,6 @@ printf "Adding dots to .termux\n"
 cp -f "$source/dots/termux.properties" "$HOME/.termux/"
 cp -f "$source/dots/colors.properties" "$HOME/.termux/"
 cp -f "$source/dots/font.ttf" "$HOME/.termux/"
-cp -f "$source/dots/motd.sh" "$HOME/.termux/"
 termux-reload-settings
 
 check_dir_exists "$HOME/storage"

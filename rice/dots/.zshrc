@@ -28,9 +28,6 @@ alias 9="cd -9"
 autoload -U compinit && compinit
 zstyle ":completion:*" matcher-list "m:{a-z}={A-Za-z}"
 
-# Enable remote
-dropbear
-
 # Aliases
 alias ls="ls --color=tty"
 alias grep="grep --color=auto"
@@ -49,15 +46,11 @@ MOTD=(
 )
 MESSAGE="${MOTD[$(( $RANDOM % ${#MOTD[@]} ))]}"
 COLUMNS=$(tput cols)
-DSTATUS=$(sv status sshd | grep -o "run" | head -n1)
 PRIVATEIP=$(ifconfig 2>/dev/null | grep -oE '192\.168\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
 
-printf "%*s\n\n\n" $(((${#MESSAGE}+$COLUMNS)/2)) "$MESSAGE\n\n\n"
+printf "\n\n\n%*s\n\n\n" $(((${#MESSAGE}+$COLUMNS)/2)) "$MESSAGE"
 printf "%*s\n" $(($COLUMNS-5)) "d4nse"
-if [[ "$DSTATUS" != "run" ]];
-then
-    printf "%*s\n" $(($COLUMNS-5)) "SSHD is down"
-else
-    printf "%*s\n" $(($COLUMNS-5)) "SSHD on $PRIVATEIP"
-fi
+printf "%*s\n" $(($COLUMNS-5)) "$PRIVATEIP"
 
+# Enable remote
+dropbear
