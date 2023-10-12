@@ -1,0 +1,10 @@
+#termux specific
+termux-services
+termux-api
+
+#misc
+neovim
+git
+ncurses-utils
+zsh
+openssh
