@@ -51,12 +51,6 @@ else
     mkdir -p "$HOME/.termux"
 fi
 
-printf "Adding dots to .termux\n"
-cp -f "$source/dots/termux.properties" "$HOME/.termux/"
-cp -f "$source/dots/colors.properties" "$HOME/.termux/"
-cp -f "$source/dots/font.ttf" "$HOME/.termux/"
-termux-reload-settings
-
 check_dir_exists "$HOME/storage"
 if $exists; then
     printf "your storage directory already exists\n"
@@ -73,12 +67,29 @@ else
     mkdir -p "$HOME/.config"
 fi
 
+check_dir_exists "$HOME/.config/nvim"
+if $exists; then
+    printf "your nvim config directory already exists\n"
+else
+    printf "creating nvim directory for the user\n"
+    mkdir -p "$HOME/.config/nvim"
+fi
+
+printf "Adding dots to .termux\n"
+cp -f "$source/dots/termux.properties" "$HOME/.termux/"
+cp -f "$source/dots/colors.properties" "$HOME/.termux/"
+cp -f "$source/dots/font.ttf" "$HOME/.termux/"
+termux-reload-settings
+
+printf "Adding dots to nvim\n"
+cp -f "$source/dots/init.nvim" "$HOME/.config/nvim/"
+
 printf "Adding dots to user home\n"
 cp -f "$source/dots/.zshrc" "$HOME"
 cp -f "$source/dots/.zprofile" "$HOME"
 cp -f "$source/dots/.p10k.zsh" "$HOME"
-echo "termux-wake-lock" > "$HOME/.zlogin"
-echo "termux-wake-unlock" > "$HOME/.zlogout"
+echo "termux-wake-lock" >"$HOME/.zlogin"
+echo "termux-wake-unlock" >"$HOME/.zlogout"
 touch "$HOME/.hushlogin"
 
 check_dir_exists "$HOME/.config/powerlevel10k"
