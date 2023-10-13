@@ -2,25 +2,14 @@
 
 source="$(pwd)/rice"
 
-check_dir_exists() {
+run_if_dir_not_exists() {
     file=$1
+    filename=$(basename "$file")
     if [ -d "$file" ]; then
-        exists=true
+        printf "your %s already exists\n" "$filename"
     else
-        printf "%s doesn't exist\n" "$file"
-        exists=false
-        $2
-    fi
-}
-
-check_file_exists() {
-    file=$1
-    if [ -f "$file" ]; then
-        exists=true
-    else
-        printf "%s doesn't exist\n" "$file"
-        exists=false
-        $2
+        printf "creating %s for the user\n" "$filename"
+        command "$2" "$3" "$4"
     fi
 }
 
@@ -43,37 +32,10 @@ apt-get upgrade -o Dpkg::Options::="--force-confnew" -y 1>/dev/null
 pkg install -y ${DEPLIST[*]} 1>/dev/null
 printf "Installed dependencies\n"
 
-check_dir_exists "$HOME/.termux"
-if $exists; then
-    printf "your .termux directory already exists\n"
-else
-    printf "creating .termux directory for the user\n"
-    mkdir -p "$HOME/.termux"
-fi
-
-check_dir_exists "$HOME/storage"
-if $exists; then
-    printf "your storage directory already exists\n"
-else
-    printf "setting storage up for the user\n"
-    termux-setup-storage
-fi
-
-check_dir_exists "$HOME/.config"
-if $exists; then
-    printf "your .config directory already exists\n"
-else
-    printf "creating .config directory for the user\n"
-    mkdir -p "$HOME/.config"
-fi
-
-check_dir_exists "$HOME/.config/nvim"
-if $exists; then
-    printf "your nvim config directory already exists\n"
-else
-    printf "creating nvim directory for the user\n"
-    mkdir -p "$HOME/.config/nvim"
-fi
+run_if_dir_not_exists "$HOME/.termux" "mkdir" "-p" "$HOME/.termux"
+run_if_dir_not_exists "$HOME/storage" "termux-setup-storage"
+run_if_dir_not_exists "$HOME/.config" "mkdir" "-p" "$HOME/.config"
+run_if_dir_not_exists "$HOME/.config/nvim" "mkdir" "-p" "$HOME/.config/nvim"
 
 printf "Adding dots to .termux\n"
 cp -f "$source/dots/termux.properties" "$HOME/.termux/"
@@ -82,7 +44,7 @@ cp -f "$source/dots/font.ttf" "$HOME/.termux/"
 termux-reload-settings
 
 printf "Adding dots to nvim\n"
-cp -f "$source/dots/init.nvim" "$HOME/.config/nvim/"
+cp -f "$source/dots/init.vim" "$HOME/.config/nvim/"
 
 printf "Adding dots to user home\n"
 cp -f "$source/dots/.zshrc" "$HOME"
@@ -92,8 +54,7 @@ echo "termux-wake-lock" >"$HOME/.zlogin"
 echo "termux-wake-unlock" >"$HOME/.zlogout"
 touch "$HOME/.hushlogin"
 
-check_dir_exists "$HOME/.config/powerlevel10k"
-if $exists; then
+if [[ -d "$HOME/.config/powerlevel10k" ]]; then
     printf "your powerlevel10k theme is already installed\n"
 else
     printf "cloning powerlevel10k from github\n"

@@ -18,6 +18,9 @@ set encoding=utf-8	            " Set encoding
 set fileformat=unix		        " File formatting
 set number			            " Enable line numbers
 set clipboard=unnamedplus	    " Enables system clipboard
+if has('termguicolors')
+    set termguicolors           " ALL THE COLORS ALL OF THEM ALL
+endif
 
 
 " Split window
