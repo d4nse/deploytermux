@@ -13,7 +13,7 @@ this is termux deployment script written by d4nse
 # TODO
 - [x] Code termux config and deployment
 - [x] Code dropbear deployment (mostly manual)
-- [ ] Code basic neovim config and deployment
+- [x] Code basic neovim config and deployment
 - [x] Code dependency installation
 - [ ] Maybe code some would-be-handy scripts
 - [ ] Come up with something more than that

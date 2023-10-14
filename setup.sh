@@ -16,18 +16,20 @@ run_if_dir_not_exists() {
 printf "This script is designed for Termux installation only\n"
 read -r -p "You sure you want to proceed? (y/n) " yn
 case $yn in
-y) ;;
+[Yy] | [Yy][Ee][Ss]) ;;
 *)
     printf "Terminating script...\n"
     exit 0
     ;;
 esac
 
+printf "Updating apt database...\n"
+apt-get update -y 1>/dev/null
+printf "Upgrading everything...\n"
+apt-get upgrade -o Dpkg::Options::="--force-confnew" -y 1>/dev/null
 printf "Installing dependencies listed in dependencies.txt...\n"
 # shellcheck disable=SC2207
 DEPLIST=($(sed -e 's/#.*$//' -e '/^$/d' dependencies.txt))
-apt-get update -y 1>/dev/null
-apt-get upgrade -o Dpkg::Options::="--force-confnew" -y 1>/dev/null
 # shellcheck disable=SC2048 disable=SC2086 # Unquoted is required since pkg cant find a string of packages
 pkg install -y ${DEPLIST[*]} 1>/dev/null
 printf "Installed dependencies\n"
