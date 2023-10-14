@@ -2,14 +2,9 @@
 
 source="$(pwd)/rice"
 
-run_if_dir_not_exists() {
-    file=$1
-    filename=$(basename "$file")
-    if [ -d "$file" ]; then
-        printf "your %s already exists\n" "$filename"
-    else
-        printf "creating %s for the user\n" "$filename"
-        command "$2" "$3" "$4"
+mkdir_if_not_exists() {
+    if [ ! -d "$1" ]; then
+        mkdir -vp "$1"
     fi
 }
 
@@ -34,19 +29,18 @@ DEPLIST=($(sed -e 's/#.*$//' -e '/^$/d' dependencies.txt))
 pkg install -y ${DEPLIST[*]} 1>/dev/null
 printf "Installed dependencies\n"
 
-run_if_dir_not_exists "$HOME/.termux" "mkdir" "-p" "$HOME/.termux"
-run_if_dir_not_exists "$HOME/storage" "termux-setup-storage"
-run_if_dir_not_exists "$HOME/.config" "mkdir" "-p" "$HOME/.config"
-run_if_dir_not_exists "$HOME/.config/nvim" "mkdir" "-p" "$HOME/.config/nvim"
-
+mkdir_if_not_exists "$HOME/.termux"
 printf "Adding dots to .termux\n"
 cp -f "$source/dots/termux.properties" "$HOME/.termux/"
 cp -f "$source/dots/colors.properties" "$HOME/.termux/"
 cp -f "$source/dots/font.ttf" "$HOME/.termux/"
 termux-reload-settings
 
+mkdir_if_not_exists "$HOME/.config/nvim"
 printf "Adding dots to nvim\n"
 cp -f "$source/dots/init.vim" "$HOME/.config/nvim/"
+
+[[ ! -d "$HOME/storage" ]] && termux-setup-storage
 
 printf "Adding dots to user home\n"
 cp -f "$source/dots/.zshrc" "$HOME"
@@ -64,11 +58,7 @@ else
 fi
 
 printf "\nLAST STEPS\n"
-printf "First of all, add this to your .ssh/config on PC:\n\nHost phone\n\tHostName termux_LAN_address\n\tUser WHOAMI_to_check_username\n\tPort 8022\n"
-printf "\nNext, run:\n\tpasswd\n\t# Set password in termux for initial ssh connection\n"
-printf "\n\tssh-keygen -t rsa -b 4096 -f id_rsa\n\t# Generate ssh keys on PC\n"
-printf "\n\trsync id_rsa.pub phone:.ssh\n\t# Send public key from PC to termux\n"
-printf "\n\tssh phone cat .ssh/id_rsa.pub >> .ssh/authorized_keys\n\t# Add public key to authorized keys file\n"
+printf "Run 'send_keys.sh' on your computer to send public keys to termux.\n"
 
 chsh -s zsh
 exec zsh
