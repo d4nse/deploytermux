@@ -2,13 +2,13 @@
 
 source="$(pwd)/rice"
 
-mkdir_if_not_exists() {
+mkdirs() {
     if [ ! -d "$1" ]; then
-        mkdir -vp "$1"
+        mkdir -p "$1"
     fi
 }
 
-printf "This script is designed for Termux installation only\n"
+printf "This script is designed to be ran on Termux only\n"
 read -r -p "You sure you want to proceed? (y/n) " yn
 case $yn in
 [Yy] | [Yy][Ee][Ss]) ;;
@@ -29,14 +29,14 @@ DEPLIST=($(sed -e 's/#.*$//' -e '/^$/d' dependencies.txt))
 pkg install -y ${DEPLIST[*]} 1>/dev/null
 printf "Installed dependencies\n"
 
-mkdir_if_not_exists "$HOME/.termux"
+mkdirs "$HOME/.termux"
 printf "Adding dots to .termux\n"
 cp -f "$source/dots/termux.properties" "$HOME/.termux/"
 cp -f "$source/dots/colors.properties" "$HOME/.termux/"
 cp -f "$source/dots/font.ttf" "$HOME/.termux/"
 termux-reload-settings
 
-mkdir_if_not_exists "$HOME/.config/nvim"
+mkdirs "$HOME/.config/nvim"
 printf "Adding dots to nvim\n"
 cp -f "$source/dots/init.vim" "$HOME/.config/nvim/"
 
@@ -57,8 +57,12 @@ else
     git clone --quiet --depth=1 "https://github.com/romkatv/powerlevel10k.git" "$HOME/.config/powerlevel10k"
 fi
 
+PRIVATEIP=$(ifconfig 2>/dev/null | grep -oE '192\.168\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
 printf "\nLAST STEPS\n"
-printf "Run 'send_keys.sh' on your computer to send public keys to termux.\n"
+printf "1. Set passwd on termux\n"
+printf "2. On pc, run: \n\tssh-keygen -t rsa -b 4096 (No need for that if you already have keys generated)\n"
+printf "3. And this:\n\tssh %s mkdir -p ~/.ssh && cat > ~/.ssh/authorized_keys <\$HOME/.ssh/id_rsa.pub\n" "$PRIVATEIP"
+printf "DONE! Now your public keys are in termux.\n"
 
 chsh -s zsh
 exec zsh
