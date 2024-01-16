@@ -47,8 +47,8 @@ if [[ ! -d "$HOME/storage" ]]; then
 fi
 
 # Change shell to ZSH
-if [ "$SHELL" != "$(which zsh)" ]; then
-  chsh -s "$(which zsh)"
+if [ "$SHELL" != "$PREFIX/bin/zsh" ]; then
+  chsh -s zsh
 fi
 
 # Reload settings lol
