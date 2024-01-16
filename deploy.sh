@@ -13,7 +13,7 @@ fi
 printf "Updating package database...\n"
 pkg update -y
 printf "Upgrading packages...\n"
-apt-get upgrade -o Dpkg::Options::="--force-confnew" -y
+apt-get -o Dpkg::Options::="--force-confnew" -y upgrade
 printf "Installing requirements...\n"
 xargs pkg install -y < "$source/requirements.txt"
 
