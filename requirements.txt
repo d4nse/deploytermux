@@ -1,0 +1,8 @@
+termux-api
+dropbear
+rsync
+git
+neovim
+ncurses-utils
+zsh
+tree
