@@ -25,23 +25,14 @@ Custom <a href="https://github.com/termux/termux-app">Termux</a> config.
 
 
 ## <a name="#installation"></a> Installation
-1. Install [Termux](https://f-droid.org/en/packages/com.termux/)
-2. Install [Termux:API](https://f-droid.org/en/packages/com.termux.api/)
-3. Install git:
+* Install [Termux](https://f-droid.org/en/packages/com.termux/)
+* Install [Termux:API](https://f-droid.org/en/packages/com.termux.api/)
+
+Copypaste this or just run line by line:
 ```zsh
-pkg install git
-```
-4. Clone this repo:
-```zsh
-git clone https://github.com/d4nse/deploytermux
-```
-5. Cd into repo:
-```zsh
-cd deploytermux
-```
-6. Run the script:
-```zsh
-chmod +x deploy.sh
+pkg install git &&
+git clone https://github.com/d4nse/deploytermux &&
+cd deploytermux &&
 bash deploy.sh
 ```
 
