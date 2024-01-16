@@ -11,10 +11,11 @@ fi
 
 # Update and install deps
 printf "Updating package database...\n"
-pkg update -y
+apt-get update
 printf "Upgrading packages...\n"
 apt-get -o Dpkg::Options::="--force-confnew" -y upgrade
 printf "Installing requirements...\n"
+pkg update
 xargs pkg install -y < "$source/requirements.txt"
 
 # Setup dirs
